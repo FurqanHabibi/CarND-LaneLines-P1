@@ -21,21 +21,26 @@ The steps of this project are the following:
 
 ### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
 
-My pipeline consisted of 6 steps. These are:
+My pipeline consisted of 9 steps. These are:
 - Grayscale
+
   Just a simple conversion to grayscale image. 
 
 - Gaussian blur
+
   Apply gaussian blur to smooth the image before detecting edges using canny.
 
 - Canny Edge Detection
+
   Apply canny edge detection to brings up all the edges in the image.
 
 - Masking region of interest
+
   Apply masking so that the next steps will only process the designated region of interest. Here I set the polygon mask to `(0, image_height), (image_length*5/12, image_height*3/5), (image_length*7/12, image_height*3/5), (image_length, image_height)`. Image below show the masked area.
   ![Masked image](writeup_images/masked_image.jpg)
 
 - Hough Lines Detection
+
   Apply hough lines detection to get all the possible lines in the image. Here I set the parameters to these values.
   ```
   rho = 1
@@ -50,6 +55,7 @@ My pipeline consisted of 6 steps. These are:
   ![Lines image](writeup_images/lines_image.jpg)
 
 - Outlier lines removal
+
   In order to get the best averaged line, there is a need to remove the outlier lines. There are many definitions of outlier, but here I use the inter-quartile-range(IQR) properties of data to define and remove outliers. Below is the definition of IQR and min, max, the point where data beyond it is considered outlier.
   ```
   IQR = Q3 - Q1
@@ -62,6 +68,7 @@ My pipeline consisted of 6 steps. These are:
   ![Removed outliers](writeup_images/removed_outliers.jpg)
 
 - Line averaging and extrapolation
+
   Now that the outlier lines are removed we can easily do averaging. To average the lines, we just average it's m and b values. However, to honor the lines lenghts, here I multiply the m/b values of a line with it's length, sum it over all the lines, and finally divide it by the the total length of the lines.
 
   For extrapolation, I just simply stretch the averaged line from the bottom to the top of the masked region.
@@ -70,6 +77,7 @@ My pipeline consisted of 6 steps. These are:
   ![Averaged and extrapolated lane lines](writeup_images/averaged_extrapolated.jpg)
 
 - Remove horizontal-like lines (handle solidYellowLeft.mp4)
+
   Using the above pipeline, in all the test images and the first test video the lane lines can be detected with relative accuracy. However, in the second test video, there are a few frame in which the lane detection is producing inaccurate detection. Below is an example.
   ![Yellow left error](writeup_images/yellow_left_error.jpg)
 
@@ -79,6 +87,7 @@ My pipeline consisted of 6 steps. These are:
   ![Yellow left corrected](writeup_images/yellow_left_corrected.jpg)
 
 - Increase horizontal-like slope limit (handle optional challenge)
+
   In the challenge video test, using the above pipeline, there are many inaccurate detection. After looking at the hough lines of the frames, one can see that there are too many erroneous line which are not part of the lane lines. Most of this line have much smaller or higher slopes then the lane line. So, in order to handle it, I increase the horizontal-like line slope criteria to be between -0.4 and 0.4. Using this, the detection runs much better with more than 95% is seen to be relatively accurate.
 
   Below are the before after of the challenge video.
